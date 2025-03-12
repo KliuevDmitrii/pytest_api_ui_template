@@ -19,10 +19,8 @@ def browser():
         config = ConfigProvider()
         timeout = config.getint("ui", "timeout")
 
-        try:
-            browser_name = config.get("ui", "browser_name").lower()
-        except KeyError:
-            browser_name = "chrome"
+        browser_name = config.get("ui", "browser_name", fallback="chrome")
+        browser_name = browser_name.lower() if browser_name else "chrome"
 
         if browser_name == 'chrome':
             browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))

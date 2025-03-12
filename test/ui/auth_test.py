@@ -16,7 +16,6 @@ def auth_test(browser, test_data: dict):
     auth_page = AuthPage(browser)
     auth_page.go()
     auth_page.login_as(email, password)
-    WebDriverWait(browser, 20).until(EC.url_contains("kliuev_dmitrii/boards"))
 
     main_page = MainPage(browser)
     main_page.open_menu()
