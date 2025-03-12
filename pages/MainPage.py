@@ -70,3 +70,5 @@ class MainPage:
         boards = container.find_elements(By.CSS_SELECTOR, "div.LinesEllipsis")
         boards_names = [board.text for board in boards]
         return boards_names
+
+
