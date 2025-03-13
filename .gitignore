@@ -458,7 +458,7 @@ pyrightconfig.json
 *lol
 
 ### VisualStudioCode ###
-.vscode/*
+.vscode
 .vscode/*
 /settings.json
 !.vscode/settings.json
