@@ -1,4 +1,3 @@
-# from logging import config
 from socket import timeout
 import pytest
 import allure
