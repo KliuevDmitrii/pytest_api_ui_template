@@ -44,7 +44,7 @@ class MainPage:
         create_board_button.click()
 
     @allure.step("Добавить заголовок доски")
-    def add_name_board(self, name_board):
+    def add_name_board(self, name_board: str):
         title_input = WebDriverWait(self.__driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 
                 "input[data-testid='create-board-title-input']"))
@@ -111,3 +111,88 @@ class MainPage:
                 "//button[@data-testid='close-board-delete-board-confirm-button']"))
             )
         button_delete_board.click()
+
+    @allure.step("Нажать 'Добавить список'")
+    def click_add_list(self):
+        click_add_list = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//button[@data-testid='list-composer-button']"
+                ))
+            )
+        click_add_list.click()
+
+    @allure.step("Добавить заголовок списка")
+    def add_name_list(self, name_list: str):
+        title_input = WebDriverWait(self.__driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 
+                "//textarea[@data-testid='list-name-textarea']"
+                ))
+            )
+        title_input.send_keys(name_list)
+
+    @allure.step("Нажать кнопку 'Добавить список'")
+    def click_button_add_list(self):
+        click_button_add_list = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//button[@data-testid='list-composer-add-list-button']"
+                ))
+            )
+        click_button_add_list.click()
+    
+    @allure.step("Добавить заголовок карточки")
+    def add_name_card(self, name_card: str):
+        title_input = WebDriverWait(self.__driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, 
+                "//textarea[@data-testid='list-card-composer-textarea']"
+                ))
+            )
+        title_input.send_keys(name_card)
+
+    @allure.step("Нажать кнопку 'Добавить карточку'")
+    def click_button_add_card(self):
+        button_add_card = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//button[@class='bxgKMAm3lq5BpA SdamsUKjxSBwGb SEj5vUdI3VvxDc'"
+                " and @type='submit' and @data-testid='list-card-composer-add-card-button' and text()='Добавить карточку']"
+                ))
+            )
+        button_add_card.click()
+
+    @allure.step("Проверка наличия карточки по названию")
+    def check_card_by_name(self, name_card: str):
+        try:
+            element = WebDriverWait(self.__driver, 20).until(
+                EC.presence_of_element_located((By.XPATH, f"//a[@data-testid='card-name' and text()='{name_card}']"))
+            )
+            print(f"Карточка с названием '{name_card}' найдена.")
+            return True
+        except:
+            print(f"Карточка с названием '{name_card}' не найдена.")
+            return False
+
+    @allure.step("Нажать на карточку для редактирования")
+    def click_button_edit_card(self):
+        button_edit_card = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "///button[@data-testid='quick-card-editor-button']"
+                ))
+            )
+        button_edit_card.click()
+
+    @allure.step("Редактировать заголовок в карточки")
+    def edit_name_card(self, new_name_card: str):
+        title_input = WebDriverWait(self.__driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, 
+                "//textarea[@data-testid='card-back-title-input']"
+                ))
+            )
+        title_input.send_keys(new_name_card)
+
+    @allure.step("Нажать закрыть карточку")
+    def click_button_edit_card(self):
+        close_card = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//span[@data-testid='CloseIcon']"
+                ))
+            )
+        close_card.click()
