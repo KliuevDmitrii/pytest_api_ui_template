@@ -4,6 +4,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.keys import Keys
 
 from configuration.ConfigProvider import ConfigProvider
 from testdata.DataProvider import DataProvider
@@ -152,11 +153,19 @@ class MainPage:
     def click_button_add_card(self):
         button_add_card = WebDriverWait(self.__driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, 
-                "//button[@class='bxgKMAm3lq5BpA SdamsUKjxSBwGb SEj5vUdI3VvxDc'"
-                " and @type='submit' and @data-testid='list-card-composer-add-card-button' and text()='Добавить карточку']"
+                "//button[contains(@class, 'SEj5vUdI3VvxDc') and @data-testid='list-card-composer-add-card-button']"
                 ))
             )
         button_add_card.click()
+
+    @allure.step("Закрыть добавление карточки")
+    def click_close_card(self):
+        close_card = WebDriverWait(self.__driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//span[@data-testid='CloseIcon']"
+                ))
+            )
+        close_card.click()
 
     @allure.step("Проверка наличия карточки по названию")
     def check_card_by_name(self, name_card: str):
@@ -171,28 +180,35 @@ class MainPage:
             return False
 
     @allure.step("Нажать на карточку для редактирования")
-    def click_button_edit_card(self):
-        button_edit_card = WebDriverWait(self.__driver, 10).until(
+    def click_edit_card(self):
+        button_edit_card = WebDriverWait(self.__driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, 
-                "///button[@data-testid='quick-card-editor-button']"
+                "//a[@data-testid='card-name']"
                 ))
             )
         button_edit_card.click()
 
-    @allure.step("Редактировать заголовок в карточки")
+    @allure.step("Редактировать заголовок карточки")
     def edit_name_card(self, new_name_card: str):
-        title_input = WebDriverWait(self.__driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, 
-                "//textarea[@data-testid='card-back-title-input']"
-                ))
-            )
-        title_input.send_keys(new_name_card)
-
-    @allure.step("Нажать закрыть карточку")
-    def click_button_edit_card(self):
-        close_card = WebDriverWait(self.__driver, 10).until(
+        title_input = WebDriverWait(self.__driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, 
-                "//span[@data-testid='CloseIcon']"
+                "//textarea[@data-testid='card-back-title-input']"))
+        )
+        
+        title_input.clear()
+        title_input.send_keys(Keys.CONTROL + 'a')
+        title_input.send_keys(Keys.DELETE)
+        title_input.send_keys(new_name_card)
+        
+        WebDriverWait(self.__driver, 15).until(
+            lambda d: title_input.get_attribute('value') == new_name_card
+        )
+
+    @allure.step("Нажать 'Сохранить' карточку")
+    def click_save_card(self):
+        save_card = WebDriverWait(self.__driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//button[@data-testid='description-save-button']"
                 ))
             )
-        close_card.click()
+        save_card.click()

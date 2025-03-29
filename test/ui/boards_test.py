@@ -10,6 +10,7 @@ from pages.MainPage import MainPage
 
 fake = Faker()
 
+@allure.title("Создание новой доски")
 def add_new_board_test(browser, test_data: dict):
     username = test_data.get("username")
     email = test_data.get("email")
@@ -31,6 +32,7 @@ def add_new_board_test(browser, test_data: dict):
     with allure.step("Проверить, что создана доска с названием "+ name_board):
         assert info[0] == name_board
 
+@allure.title("Удаление новой доски")
 def delete_new_board_test(browser, test_data: dict):
     username = test_data.get("username")
     email = test_data.get("email")

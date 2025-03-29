@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from pages.AuthPage import AuthPage
 from pages.MainPage import MainPage
 
-
+@allure.title("Авторизация пользователя")
 def auth_test(browser, test_data: dict):
     username = test_data.get("username")
     email = test_data.get("email")
