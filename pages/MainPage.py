@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver import ActionChains
 
 from configuration.ConfigProvider import ConfigProvider
 from testdata.DataProvider import DataProvider
@@ -133,7 +134,7 @@ class MainPage:
 
     @allure.step("Нажать кнопку 'Добавить список'")
     def click_button_add_list(self):
-        click_button_add_list = WebDriverWait(self.__driver, 10).until(
+        click_button_add_list = WebDriverWait(self.__driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, 
                 "//button[@data-testid='list-composer-add-list-button']"
                 ))
@@ -142,7 +143,7 @@ class MainPage:
     
     @allure.step("Добавить заголовок карточки")
     def add_name_card(self, name_card: str):
-        title_input = WebDriverWait(self.__driver, 15).until(
+        title_input = WebDriverWait(self.__driver, 20).until(
             EC.presence_of_element_located((By.XPATH, 
                 "//textarea[@data-testid='list-card-composer-textarea']"
                 ))
@@ -151,7 +152,7 @@ class MainPage:
 
     @allure.step("Нажать кнопку 'Добавить карточку'")
     def click_button_add_card(self):
-        button_add_card = WebDriverWait(self.__driver, 10).until(
+        button_add_card = WebDriverWait(self.__driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, 
                 "//button[contains(@class, 'SEj5vUdI3VvxDc') and @data-testid='list-card-composer-add-card-button']"
                 ))
@@ -160,7 +161,7 @@ class MainPage:
 
     @allure.step("Закрыть добавление карточки")
     def click_close_card(self):
-        close_card = WebDriverWait(self.__driver, 10).until(
+        close_card = WebDriverWait(self.__driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, 
                 "//span[@data-testid='CloseIcon']"
                 ))
@@ -168,25 +169,31 @@ class MainPage:
         close_card.click()
 
     @allure.step("Проверка наличия карточки по названию")
-    def check_card_by_name(self, name_card: str):
+    def check_card_by_name(self, card_name: str):
         try:
             element = WebDriverWait(self.__driver, 20).until(
-                EC.presence_of_element_located((By.XPATH, f"//a[@data-testid='card-name' and text()='{name_card}']"))
+                EC.presence_of_element_located((By.XPATH, f"//a[@data-testid='card-name' and text()='{card_name}']"))
             )
-            print(f"Карточка с названием '{name_card}' найдена.")
+            print(f"Карточка с названием '{card_name}' найдена.")
             return True
         except:
-            print(f"Карточка с названием '{name_card}' не найдена.")
+            print(f"Карточка с названием '{card_name}' не найдена.")
             return False
 
     @allure.step("Нажать на карточку для редактирования")
-    def click_edit_card(self):
-        button_edit_card = WebDriverWait(self.__driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, 
-                "//a[@data-testid='card-name']"
-                ))
+    def click_card(self, card_name: str):
+        card_xpath = f"//li[@data-testid='list-card']//a[@data-testid='card-name' and contains(text(), '{card_name}')]"
+        
+        try:
+            card = WebDriverWait(self.__driver, 30).until(
+                EC.element_to_be_clickable((By.XPATH, card_xpath))
             )
-        button_edit_card.click()
+            
+            card.click()
+        except Exception as e:
+            allure.attach(self.__driver.get_screenshot_as_png(), name="click_card_fail", attachment_type=allure.attachment_type.PNG)
+            raise AssertionError(f"Не удалось кликнуть по карточке '{card_name}': {str(e)}")
+
 
     @allure.step("Редактировать заголовок карточки")
     def edit_name_card(self, new_name_card: str):
@@ -196,11 +203,9 @@ class MainPage:
         )
         
         title_input.clear()
-        title_input.send_keys(Keys.CONTROL + 'a')
-        title_input.send_keys(Keys.DELETE)
         title_input.send_keys(new_name_card)
         
-        WebDriverWait(self.__driver, 15).until(
+        WebDriverWait(self.__driver, 20).until(
             lambda d: title_input.get_attribute('value') == new_name_card
         )
 
@@ -212,3 +217,28 @@ class MainPage:
                 ))
             )
         save_card.click()
+
+    @allure.step("Перетащить карточку в другой список")
+    def drag_and_drop_card(self, card_name):
+        card_xpath = f"//a[@data-testid='card-name' and text()='{card_name}']"
+        card = WebDriverWait(self.__driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, card_xpath))
+        )
+
+        process_list = WebDriverWait(self.__driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, "//textarea[@data-testid='list-name-textarea' and @aria-label='В процессе']"))
+        )
+
+        action = ActionChains(self.__driver)
+        action.click_and_hold(card).move_to_element(process_list).release().perform()
+
+    @allure.step("карточка находится в списке 'В процессе'")
+    def is_card_in_list(self, card_name):
+        try:
+            card_xpath = f"//div[@data-testid='list'][.//h2[text()='В процессе']]//a[@data-testid='card-name' and text()='{card_name}']"
+            card_element = WebDriverWait(self.__driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, card_xpath))
+            )
+            return card_element.is_displayed()
+        except TimeoutException:
+            return False
