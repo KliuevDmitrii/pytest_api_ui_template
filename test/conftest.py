@@ -9,8 +9,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 from api.BoardApi import BoardApi
+from api.CardApi import CardApi
 from configuration.ConfigProvider import ConfigProvider
 from testdata.DataProvider import DataProvider
+
+from faker import Faker
+
+fake = Faker()
 
 @pytest.fixture
 def browser():
@@ -38,7 +43,7 @@ def browser():
 
 
 @pytest.fixture
-def api_client() -> BoardApi:
+def board_api_client() -> BoardApi:
     config = ConfigProvider()
     data_provider = DataProvider()
     return BoardApi(
@@ -47,6 +52,16 @@ def api_client() -> BoardApi:
         data_provider.get_token()
     )
     
+@pytest.fixture
+def card_api_client() -> CardApi:
+    config = ConfigProvider()
+    data_provider = DataProvider()
+    return CardApi(
+        config.get("api", "base_url"),
+        config.get("api", "api_key"),
+        data_provider.get_token()
+    )
+
 @pytest.fixture
 def api_client_no_auth() -> BoardApi:
     return BoardApi(ConfigProvider().get("api", "base_url"), "")
@@ -68,3 +83,22 @@ def dummi_board_id() -> str:
 @pytest.fixture
 def test_data():
     return DataProvider()
+
+@pytest.fixture
+def board_id(board_api_client: BoardApi, test_data: DataProvider):
+    name_board = fake.company()
+    org_id = test_data.get("org_id")
+    board = board_api_client.create_board(org_id=org_id, name=name_board)
+    assert board and "id" in board, "Ошибка при создании доски"
+    return board["id"]
+
+@pytest.fixture
+def existing_board_id(board_api_client: BoardApi, test_data: DataProvider) -> str:
+    """Получает ID первой существующей доски в организации"""
+    org_id = test_data.get("org_id")
+    assert org_id, "Ошибка: отсутствует org_id в тестовых данных"
+
+    boards = board_api_client.get_all_boards_by_org_id(org_id)
+    assert boards, "Ошибка: в организации нет доступных досок"
+
+    return boards[0]["id"]
