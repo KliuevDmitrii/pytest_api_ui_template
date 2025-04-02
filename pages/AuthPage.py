@@ -25,5 +25,6 @@ class AuthPage:
         self.__driver.find_element(By.CSS_SELECTOR, "#password").send_keys(password)
         self.__driver.find_element(By.CSS_SELECTOR, "#login-submit").click()
 
+    @allure.step("Получить текущий URL")
     def get_current_url(self):
         return self.__driver.current_url

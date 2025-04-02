@@ -1,12 +1,15 @@
+import allure
 import requests
 import json
 
 class CardApi:
+    """ Этот класс предназначен для работы с API создания карточек """
     def __init__(self, base_url: str, api_key: str, token: str):
         self.base_url = base_url
         self.api_key = api_key
         self.token = token
 
+    @allure.step("Получить все карточки в списке")
     def get_all_cards_by_list_id(self, list_id: str) -> list:
         """ Получить все карточки в списке """
         path = f"{self.base_url}/lists/{list_id}/cards"
@@ -17,6 +20,7 @@ class CardApi:
         resp = requests.get(path, params=params)
         return self._handle_response(resp)
 
+    @allure.step("Получить ID первого списка на доске")
     def get_first_list_id(self, board_id: str) -> str:
         """ Получить ID первого списка на доске """
         path = f"{self.base_url}/boards/{board_id}/lists"
@@ -30,6 +34,7 @@ class CardApi:
             raise ValueError(f"Ошибка: на доске {board_id} нет списков")
         return lists[0]["id"]
 
+    @allure.step("Создать новую карточку в списке")
     def create_card(self, list_id: str, name: str) -> dict:
         """ Создать новую карточку в списке """
         path = f"{self.base_url}/cards"
@@ -44,6 +49,7 @@ class CardApi:
         resp = requests.post(path, json=body, params=params)
         return self._handle_response(resp)
 
+    @allure.step("Удалить карточку по ID")
     def delete_card_by_id(self, card_id: str) -> dict:
         """ Удалить карточку по ID """
         path = f"{self.base_url}/cards/{card_id}"
