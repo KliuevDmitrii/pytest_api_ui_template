@@ -19,6 +19,21 @@ class CardApi:
         }
         resp = requests.get(path, params=params)
         return self._handle_response(resp)
+    
+    @allure.step("Получить информацию о конкретной карточке")
+    def get_card(self, card_id: str) -> dict:
+        """Получить информацию о конкретной карточке"""
+        path = f"{self.base_url}/cards/{card_id}"
+        params = {
+            "key": self.api_key,
+            "token": self.token
+        }
+        response = requests.get(path, params=params)
+        
+        if response.status_code != 200:
+            raise Exception(f"Ошибка получения карточки {card_id}: {response.status_code}")
+        
+        return response.json()
 
     @allure.step("Получить ID первого списка на доске")
     def get_first_list_id(self, board_id: str) -> str:
@@ -47,6 +62,20 @@ class CardApi:
             "name": name
         }
         resp = requests.post(path, json=body, params=params)
+        return self._handle_response(resp)
+    
+    @allure.step("Редактировать карточку в списке")
+    def update_card(self, card_id: str, name: str) -> dict:
+        """ Редактировать карточку по ID """
+        path = f"{self.base_url}/cards/{card_id}"
+        params = {
+            "key": self.api_key,
+            "token": self.token
+        }
+        data = {
+            "name": name
+        }
+        resp = requests.put(path, params=params, json=data)
         return self._handle_response(resp)
 
     @allure.step("Удалить карточку по ID")
