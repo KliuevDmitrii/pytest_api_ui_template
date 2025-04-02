@@ -161,7 +161,7 @@ class MainPage:
 
     @allure.step("Закрыть добавление карточки")
     def click_close_card(self):
-        close_card = WebDriverWait(self.__driver, 30).until(
+        close_card = WebDriverWait(self.__driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, 
                 "//span[@data-testid='CloseIcon']"
                 ))
@@ -171,7 +171,7 @@ class MainPage:
     @allure.step("Проверка наличия карточки по названию")
     def check_card_by_name(self, card_name: str):
         try:
-            element = WebDriverWait(self.__driver, 20).until(
+            element = WebDriverWait(self.__driver, 15).until(
                 EC.presence_of_element_located((By.XPATH, f"//a[@data-testid='card-name' and text()='{card_name}']"))
             )
             print(f"Карточка с названием '{card_name}' найдена.")
@@ -185,7 +185,7 @@ class MainPage:
         card_xpath = f"//li[@data-testid='list-card']//a[@data-testid='card-name' and contains(text(), '{card_name}')]"
         
         try:
-            card = WebDriverWait(self.__driver, 30).until(
+            card = WebDriverWait(self.__driver, 25).until(
                 EC.element_to_be_clickable((By.XPATH, card_xpath))
             )
             
@@ -198,7 +198,7 @@ class MainPage:
     @allure.step("Редактировать заголовок карточки")
     def edit_name_card(self, new_name_card: str):
         title_input = WebDriverWait(self.__driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, 
+            EC.presence_of_element_located((By.XPATH, 
                 "//textarea[@data-testid='card-back-title-input']"))
         )
         
@@ -236,9 +236,18 @@ class MainPage:
     def is_card_in_list(self, card_name):
         try:
             card_xpath = f"//div[@data-testid='list'][.//h2[text()='В процессе']]//a[@data-testid='card-name' and text()='{card_name}']"
-            card_element = WebDriverWait(self.__driver, 10).until(
+            card_element = WebDriverWait(self.__driver, 20).until(
                 EC.presence_of_element_located((By.XPATH, card_xpath))
             )
             return card_element.is_displayed()
         except TimeoutException:
             return False
+
+    @allure.step("Нажать 'Архивировать' карточку")
+    def click_archive_card(self):
+        archive_card = WebDriverWait(self.__driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, 
+                "//button[@data-testid='card-back-archive-button']"
+                ))
+            )
+        archive_card.click()

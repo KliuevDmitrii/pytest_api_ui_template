@@ -64,6 +64,7 @@ def edit_card_test(browser, test_data: dict):
     main_page.add_name_card(name_card)
     main_page.click_button_add_card()
     main_page.click_close_card()
+
     sleep(3)
     main_page.click_card(name_card)
     
@@ -104,3 +105,35 @@ def drag_and_drop_card_test(browser, test_data: dict):
 
     with allure.step("Проверка, что карточка перемещена в 'В процессе'"):
         assert main_page.is_card_in_list(card_name), "Карточка не переместилась в список 'В процессе'" 
+
+@allure.title("Архивация новой карточки")
+def archive_card_test(browser, test_data: dict):
+    username = test_data.get("username")
+    email = test_data.get("email")
+    password = test_data.get("pass")
+
+    auth_page = AuthPage(browser)
+    auth_page.go()
+    auth_page.login_as(email, password)
+
+    main_page = MainPage(browser)
+    main_page.click_button_create_board()
+
+    name_board = fake.word()
+
+    main_page.add_name_board(name_board)
+    main_page.click_button_create()
+
+    name_card = fake.word()
+
+    main_page.add_name_card(name_card)
+    main_page.click_button_add_card()
+    main_page.click_close_card()
+
+    sleep(3)
+    main_page.click_card(name_card)
+    main_page.click_archive_card()
+    main_page.click_close_card()
+
+    with allure.step(f"Проверка наличия карточки : {name_card}"):
+        assert main_page.check_card_by_name(name_card) == False, f"Карточка с названием '{name_card}' найдена."
