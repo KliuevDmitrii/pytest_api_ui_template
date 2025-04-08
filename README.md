@@ -36,7 +36,7 @@
 
 ---
 
-### Пример `test_config.ini`
+### Пример `test_config.ini` , `test_data.json`
 
 ```ini
 [ui]  
@@ -52,8 +52,6 @@ base_url=https://api.trello.com/1
 api_key=ВАШ_API_КЛЮЧ
 
 ---
-
-### Пример `test_data.json`
 
 ```json
 {
