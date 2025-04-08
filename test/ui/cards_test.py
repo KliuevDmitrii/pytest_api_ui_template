@@ -64,8 +64,6 @@ def edit_card_test(browser, test_data: dict):
     main_page.add_name_card(name_card)
     main_page.click_button_add_card()
     main_page.click_close_card()
-
-    sleep(3)
     main_page.click_card(name_card)
     
     new_name = fake.word()
@@ -100,7 +98,6 @@ def drag_and_drop_card_test(browser, test_data: dict):
     main_page.add_name_card(card_name)
     main_page.click_button_add_card()
     main_page.click_close_card()
-    sleep(3)
     main_page.drag_and_drop_card(card_name)
 
     with allure.step("Проверка, что карточка перемещена в 'В процессе'"):
@@ -129,8 +126,6 @@ def archive_card_test(browser, test_data: dict):
     main_page.add_name_card(name_card)
     main_page.click_button_add_card()
     main_page.click_close_card()
-
-    sleep(3)
     main_page.click_card(name_card)
     main_page.click_archive_card()
     main_page.click_close_card()

@@ -20,7 +20,7 @@ def add_new_board_test(browser, test_data: dict):
     auth_page = AuthPage(browser)
     auth_page.go()
     auth_page.login_as(email, password)
-    WebDriverWait(browser, 20).until(EC.url_contains("kliuev_dmitrii/boards"))
+    WebDriverWait(browser, 20).until(EC.url_contains("/boards"))
 
     main_page = MainPage(browser)
     main_page.click_button_create_board()
@@ -42,7 +42,7 @@ def delete_new_board_test(browser, test_data: dict):
     auth_page = AuthPage(browser)
     auth_page.go()
     auth_page.login_as(email, password)
-    WebDriverWait(browser, 20).until(EC.url_contains("kliuev_dmitrii/boards"))
+    WebDriverWait(browser, 20).until(EC.url_contains("/boards"))
 
     main_page = MainPage(browser)
     main_page.click_button_create_board()

@@ -82,7 +82,7 @@ def dummi_board_id() -> str:
         else:
             raise ValueError("Ошибка при создании доски: ответ API не содержит ID")
         
-@pytest.fixture
+@pytest.fixture(scope="session")
 def test_data():
     return DataProvider()
 

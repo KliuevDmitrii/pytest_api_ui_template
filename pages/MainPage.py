@@ -1,4 +1,5 @@
 import allure
+from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait 
@@ -182,14 +183,16 @@ class MainPage:
 
     @allure.step("Нажать на карточку для редактирования")
     def click_card(self, card_name: str):
-        card_xpath = f"//li[@data-testid='list-card']//a[@data-testid='card-name' and contains(text(), '{card_name}')]"
-        
+        sleep(1)
+        card_xpath = f"//div[@data-testid='list']//li[@data-testid='list-card']//a[@data-testid='card-name' and contains(normalize-space(), '{card_name}')]"
+
         try:
-            card = WebDriverWait(self.__driver, 25).until(
-                EC.element_to_be_clickable((By.XPATH, card_xpath))
+            card = WebDriverWait(self.__driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, card_xpath))
             )
-            
-            card.click()
+
+            self.__driver.execute_script("arguments[0].click();", card)
+
         except Exception as e:
             allure.attach(self.__driver.get_screenshot_as_png(), name="click_card_fail", attachment_type=allure.attachment_type.PNG)
             raise AssertionError(f"Не удалось кликнуть по карточке '{card_name}': {str(e)}")
@@ -220,6 +223,7 @@ class MainPage:
 
     @allure.step("Перетащить карточку в другой список")
     def drag_and_drop_card(self, card_name):
+        sleep(1)
         card_xpath = f"//a[@data-testid='card-name' and text()='{card_name}']"
         card = WebDriverWait(self.__driver, 20).until(
             EC.presence_of_element_located((By.XPATH, card_xpath))
@@ -251,3 +255,9 @@ class MainPage:
                 ))
             )
         archive_card.click()
+
+    def is_logged_in(self) -> bool:
+        try:
+            return bool(self.__driver.get_cookie('loggedIn'))
+        except:
+            return False
