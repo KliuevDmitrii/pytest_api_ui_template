@@ -53,7 +53,7 @@ api_key=ВАШ_API_КЛЮЧ
 
 ---
 
-```json
+test_data.json
 {
   "token": "ВАШ_ТОКЕН",
   "username": "ваш_логин",
