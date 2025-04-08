@@ -7,11 +7,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from pages.AuthPage import AuthPage
 from pages.MainPage import MainPage
+from api.BoardApi import BoardApi
 
 fake = Faker()
 
 @allure.title("Создание новой доски")
-def add_new_board_test(browser, test_data: dict):
+def add_new_board_test(browser, test_data: dict, board_api_client: BoardApi):
     username = test_data.get("username")
     email = test_data.get("email")
     password = test_data.get("pass")
@@ -28,6 +29,12 @@ def add_new_board_test(browser, test_data: dict):
     main_page.click_button_create()
     main_page.click_button_boards()
     info = main_page.get_boards_info()
+
+    org_id = test_data.get("org_id")
+    board_list_before = board_api_client.get_all_boards_by_org_id(org_id)
+    board_id = board_list_before[0]["id"]
+
+    board_api_client.delete_board_by_id(board_id)
 
     with allure.step("Проверить, что создана доска с названием "+ name_board):
         assert info[0] == name_board
