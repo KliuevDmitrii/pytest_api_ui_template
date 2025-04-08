@@ -18,5 +18,3 @@ class ConfigProvider:
 
     def get_ui_url(self, fallback=""):
         return self.get("ui", "boards_url", fallback)
-
-    

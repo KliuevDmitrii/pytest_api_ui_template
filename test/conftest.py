@@ -46,61 +46,67 @@ def browser():
 
 @pytest.fixture
 def board_api_client() -> BoardApi:
-    config = ConfigProvider()
-    data_provider = DataProvider()
-    return BoardApi(
-        config.get("api", "base_url"),
-        config.get("api", "api_key"),
-        data_provider.get_token()
-    )
+    with allure.step("Создать API-клиент для досок с авторизацией"):
+        config = ConfigProvider()
+        data_provider = DataProvider()
+        return BoardApi(
+            config.get("api", "base_url"),
+            config.get("api", "api_key"),
+            data_provider.get_token()
+        )
     
 @pytest.fixture
 def card_api_client() -> CardApi:
-    config = ConfigProvider()
-    data_provider = DataProvider()
-    return CardApi(
-        config.get("api", "base_url"),
-        config.get("api", "api_key"),
-        data_provider.get_token()
-    )
+    with allure.step("Создать API-клиент для карточек с авторизацией"):
+        config = ConfigProvider()
+        data_provider = DataProvider()
+        return CardApi(
+            config.get("api", "base_url"),
+            config.get("api", "api_key"),
+            data_provider.get_token()
+        )
 
 @pytest.fixture
 def api_client_no_auth() -> BoardApi:
-    return BoardApi(ConfigProvider().get("api", "base_url"), "")
+    with allure.step("Создать API-клиент без авторизации"):
+        return BoardApi(ConfigProvider().get("api", "base_url"), "")
 
 @pytest.fixture
 def dummi_board_id() -> str:
-    api = BoardApi(
-        ConfigProvider().get("api", "base_url"),
-        DataProvider().get_token()
-        )
+    with allure.step("Создать временную доску для удаления"):
+        api = BoardApi(
+            ConfigProvider().get("api", "base_url"),
+            DataProvider().get_token()
+            )
 
-    with allure.step("Предварительно создать доску"):
-        board = api.create_board("Board to be deleted")
-        if board and "id" in board:
-            return board["id"]
-        else:
-            raise ValueError("Ошибка при создании доски: ответ API не содержит ID")
+        with allure.step("Предварительно создать доску"):
+            board = api.create_board("Board to be deleted")
+            if board and "id" in board:
+                return board["id"]
+            else:
+                raise ValueError("Ошибка при создании доски: ответ API не содержит ID")
         
 @pytest.fixture(scope="session")
 def test_data():
-    return DataProvider()
+    with allure.step("Загрузить тестовые данные"):
+        return DataProvider()
 
 @pytest.fixture
 def board_id(board_api_client: BoardApi, test_data: DataProvider):
-    name_board = fake.company()
-    org_id = test_data.get("org_id")
-    board = board_api_client.create_board(org_id=org_id, name=name_board)
-    assert board and "id" in board, "Ошибка при создании доски"
-    return board["id"]
+    with allure.step("Создать доску и вернуть её ID"):
+        name_board = fake.company()
+        org_id = test_data.get("org_id")
+        board = board_api_client.create_board(org_id=org_id, name=name_board)
+        assert board and "id" in board, "Ошибка при создании доски"
+        return board["id"]
 
 @pytest.fixture
 def existing_board_id(board_api_client: BoardApi, test_data: DataProvider) -> str:
-    """Получает ID первой существующей доски в организации"""
-    org_id = test_data.get("org_id")
-    assert org_id, "Ошибка: отсутствует org_id в тестовых данных"
+    with allure.step("Получить ID первой существующей доски в организации"):
+        org_id = test_data.get("org_id")
+        assert org_id, "Ошибка: отсутствует org_id в тестовых данных"
 
-    boards = board_api_client.get_all_boards_by_org_id(org_id)
-    assert boards, "Ошибка: в организации нет доступных досок"
+        boards = board_api_client.get_all_boards_by_org_id(org_id)
+        assert boards, "Ошибка: в организации нет доступных досок"
 
-    return boards[0]["id"]
+        return boards[0]["id"]

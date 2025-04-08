@@ -25,4 +25,5 @@ class DataProvider:
         return self.get("token")
     
     def get_cookies(self) -> list[dict]:
+        """Получить cookies."""
         return self.get("cookies", [])
