@@ -9,11 +9,12 @@ from selenium.webdriver.common.by import By
 
 from pages.AuthPage import AuthPage
 from pages.MainPage import MainPage
+from api.BoardApi import BoardApi
 
 fake = Faker()
 
 @allure.title("Добавление новой карточки на доску")
-def add_new_card_test(browser, test_data: dict):
+def add_new_card_test(browser, test_data: dict, board_api_client: BoardApi):
     username = test_data.get("username")
     email = test_data.get("email")
     password = test_data.get("pass")
@@ -36,11 +37,17 @@ def add_new_card_test(browser, test_data: dict):
     main_page.click_button_add_card()
     main_page.click_close_card()
 
+    org_id = test_data.get("org_id")
+    board_list_before = board_api_client.get_all_boards_by_org_id(org_id)
+    board_id = board_list_before[0]["id"]
+
+    board_api_client.delete_board_by_id(board_id)
+
     with allure.step(f"Проверка наличия карточки с названием: {name_card}"):
         assert main_page.check_card_by_name(name_card) == True, f"Карточка с названием '{name_card}' не найдена."
 
 @allure.title("Редактирование новой карточки")
-def edit_card_test(browser, test_data: dict):
+def edit_card_test(browser, test_data: dict, board_api_client: BoardApi):
     username = test_data.get("username")
     email = test_data.get("email")
     password = test_data.get("pass")
@@ -70,11 +77,17 @@ def edit_card_test(browser, test_data: dict):
     main_page.click_save_card()
     main_page.click_close_card()
 
+    org_id = test_data.get("org_id")
+    board_list_before = board_api_client.get_all_boards_by_org_id(org_id)
+    board_id = board_list_before[0]["id"]
+
+    board_api_client.delete_board_by_id(board_id)
+
     with allure.step(f"Проверка наличия карточки с новым названием: {new_name}"):
         assert main_page.check_card_by_name(new_name) == True, f"Карточка с новым названием '{new_name}' не найдена."
 
 @allure.title("Перетаскивание карточки в другой список")
-def drag_and_drop_card_test(browser, test_data: dict):
+def drag_and_drop_card_test(browser, test_data: dict, board_api_client: BoardApi):
     username = test_data.get("username")
     email = test_data.get("email")
     password = test_data.get("pass")
@@ -98,11 +111,17 @@ def drag_and_drop_card_test(browser, test_data: dict):
     main_page.click_close_card()
     main_page.drag_and_drop_card(card_name)
 
+    org_id = test_data.get("org_id")
+    board_list_before = board_api_client.get_all_boards_by_org_id(org_id)
+    board_id = board_list_before[0]["id"]
+
+    board_api_client.delete_board_by_id(board_id)
+
     with allure.step("Проверка, что карточка перемещена в 'В процессе'"):
         assert main_page.is_card_in_list(card_name), "Карточка не переместилась в список 'В процессе'" 
 
 @allure.title("Архивация новой карточки")
-def archive_card_test(browser, test_data: dict):
+def archive_card_test(browser, test_data: dict, board_api_client: BoardApi):
     username = test_data.get("username")
     email = test_data.get("email")
     password = test_data.get("pass")
@@ -127,6 +146,12 @@ def archive_card_test(browser, test_data: dict):
     main_page.click_card(name_card)
     main_page.click_archive_card()
     main_page.click_close_card()
+
+    org_id = test_data.get("org_id")
+    board_list_before = board_api_client.get_all_boards_by_org_id(org_id)
+    board_id = board_list_before[0]["id"]
+
+    board_api_client.delete_board_by_id(board_id)
 
     with allure.step(f"Проверка наличия карточки : {name_card}"):
         assert main_page.check_card_by_name(name_card) == False, f"Карточка с названием '{name_card}' найдена."

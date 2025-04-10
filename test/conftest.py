@@ -110,3 +110,17 @@ def existing_board_id(board_api_client: BoardApi, test_data: DataProvider) -> st
         assert boards, "Ошибка: в организации нет доступных досок"
 
         return boards[0]["id"]
+    
+@pytest.fixture
+def temp_board_id(board_api_client: BoardApi, test_data: DataProvider):
+    name_board = fake.company()
+    org_id = test_data.get("org_id")
+
+    with allure.step(f"Создать временную доску '{name_board}'"):
+        board = board_api_client.create_board(org_id=org_id, name=name_board)
+        board_id = board.get("id")
+        assert board_id, "Не удалось создать доску"
+        yield board_id
+
+    with allure.step("Удалить временную доску после теста"):
+        board_api_client.delete_board_by_id(board_id)
